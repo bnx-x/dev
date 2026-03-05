@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Morning Stretch</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #0a0f1a; color: #f0f0f0; min-height: 100vh; padding-bottom: 40px; }
+  header { background: linear-gradient(135deg, #0f1a2e, #0d1a30); padding: 28px 20px 20px; text-align: center; border-bottom: 1px solid #1a2a4a; }
+  header h1 { font-size: 1.5rem; font-weight: 700; color: #60a5fa; }
+  header p { font-size: 0.82rem; color: #888; margin-top: 4px; }
+  .stats { display: flex; justify-content: center; gap: 28px; padding: 14px 20px; background: #0a1020; border-bottom: 1px solid #0f1e3a; }
+  .stat { text-align: center; }
+  .stat-num { font-size: 1.4rem; font-weight: 700; color: #60a5fa; }
+  .stat-label { font-size: 0.68rem; color: #666; text-transform: uppercase; letter-spacing: 0.5px; }
+
+  .cold-banner { margin: 14px 14px 0; background: #0f1e35; border: 1px solid #1e3a5f; border-radius: 14px; padding: 12px 16px; display: flex; gap: 10px; align-items: flex-start; }
+  .cold-banner span { font-size: 0.82rem; color: #93c5fd; line-height: 1.5; }
+
+  .timer-section { margin: 12px 14px; background: #0f1a2e; border-radius: 18px; border: 1px solid #1a2540; padding: 20px; text-align: center; }
+  .timer-pose { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1px; color: #60a5fa; margin-bottom: 6px; }
+  .timer-name { font-size: 1.05rem; font-weight: 700; color: #e0e0f0; margin-bottom: 4px; min-height: 26px; }
+  .timer-tag { font-size: 0.72rem; color: #4a7aaa; margin-bottom: 14px; min-height: 16px; }
+  .timer-circle { position: relative; width: 130px; height: 130px; margin: 0 auto 18px; }
+  .timer-circle svg { transform: rotate(-90deg); }
+  .timer-circle circle.bg { fill: none; stroke: #1a2540; stroke-width: 8; }
+  .timer-circle circle.prog { fill: none; stroke: #60a5fa; stroke-width: 8; stroke-linecap: round; stroke-dasharray: 345; stroke-dashoffset: 0; transition: stroke-dashoffset 1s linear; }
+  .timer-display { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 2rem; font-weight: 800; color: #e0e0f0; }
+  .timer-btns { display: flex; gap: 10px; justify-content: center; }
+  .btn { padding: 11px 24px; border-radius: 12px; border: none; font-size: 0.9rem; font-weight: 700; cursor: pointer; transition: opacity 0.2s; }
+  .btn-primary { background: linear-gradient(135deg, #2563eb, #60a5fa); color: white; }
+  .btn-secondary { background: #1a2540; color: #60a5fa; }
+  .btn:active { opacity: 0.75; }
+  .progress-dots { display: flex; gap: 5px; justify-content: center; margin-top: 14px; flex-wrap: wrap; }
+  .dot { width: 8px; height: 8px; border-radius: 50%; background: #1a2540; transition: background 0.3s; }
+  .dot.active { background: #60a5fa; }
+  .dot.done { background: #1d4ed8; }
+
+  .phase-label { padding: 16px 20px 6px; font-size: 0.68rem; text-transform: uppercase; letter-spacing: 1px; color: #2563eb; font-weight: 700; }
+  .section-title { padding: 16px 20px 6px; font-size: 0.68rem; text-transform: uppercase; letter-spacing: 1px; color: #666; }
+  .card { margin: 0 14px 10px; background: #0f1a2e; border-radius: 16px; overflow: hidden; border: 1px solid #1a2540; }
+  .card-header { display: flex; align-items: center; padding: 14px 16px; gap: 12px; cursor: pointer; }
+  .num { width: 30px; height: 30px; border-radius: 50%; background: linear-gradient(135deg, #2563eb, #60a5fa); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.82rem; flex-shrink: 0; color: white; }
+  .tag-pill { font-size: 0.62rem; padding: 2px 8px; border-radius: 20px; display: inline-block; margin-top: 3px; font-weight: 600; letter-spacing: 0.3px; }
+  .tag-warmup { background: #1a3a2a; color: #4ade80; }
+  .tag-hamstring { background: #1a2a3a; color: #60a5fa; }
+  .tag-hip { background: #2a1a3a; color: #c084fc; }
+  .tag-groin { background: #3a1a1a; color: #f87171; }
+  .tag-full { background: #2a2a1a; color: #facc15; }
+  .card-info { flex: 1; }
+  .card-info h3 { font-size: 0.95rem; font-weight: 600; color: #e0e0f0; }
+  .card-info .duration { font-size: 0.75rem; color: #60a5fa; margin-top: 2px; display: block; }
+  .chevron { color: #444; font-size: 1.2rem; transition: transform 0.3s; }
+  .chevron.open { transform: rotate(90deg); }
+  .card-body { display: none; padding: 0 16px 16px; border-top: 1px solid #1a2540; }
+  .card-body.open { display: block; }
+  .card-body p { font-size: 0.86rem; color: #aaa; line-height: 1.65; padding-top: 12px; }
+  .tutorial-btn { display: flex; align-items: center; gap: 8px; margin-top: 12px; background: #2563eb18; border: 1px solid #2563eb44; border-radius: 10px; padding: 10px 14px; text-decoration: none; color: #60a5fa; font-size: 0.84rem; font-weight: 600; }
+
+  .week-section { margin: 0 14px 12px; background: #0f1a2e; border-radius: 16px; border: 1px solid #1a2540; padding: 16px; }
+  .week-section h3 { font-size: 0.72rem; font-weight: 700; color: #60a5fa; margin-bottom: 12px; text-transform: uppercase; letter-spacing: 0.5px; }
+  .week-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; }
+  .day-dot { height: 38px; border-radius: 8px; background: #1a2540; display: flex; align-items: center; justify-content: center; font-size: 0.65rem; color: #555; flex-direction: column; gap: 2px; cursor: pointer; transition: all 0.2s; }
+  .day-dot.done { background: linear-gradient(135deg, #2563eb, #60a5fa); color: white; }
+  .day-dot.today { border: 2px solid #60a5fa; color: #60a5fa; }
+  .tips { margin: 0 14px 24px; background: #0f1a2e; border-radius: 16px; border: 1px solid #1a2540; padding: 16px; }
+  .tips h3 { font-size: 0.72rem; font-weight: 700; color: #60a5fa; margin-bottom: 12px; text-transform: uppercase; letter-spacing: 0.5px; }
+  .tip { display: flex; gap: 10px; margin-bottom: 10px; font-size: 0.83rem; color: #aaa; line-height: 1.5; }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>🌅 Morning Stretch</h1>
+  <p>12 minutes · Floor-based · No warm-up needed</p>
+</header>
+
+<div class="stats">
+  <div class="stat"><div class="stat-num">12</div><div class="stat-label">Minutes</div></div>
+  <div class="stat"><div class="stat-num">10</div><div class="stat-label">Stretches</div></div>
+  <div class="stat"><div class="stat-num" id="streakNum">0</div><div class="stat-label">Day Streak</div></div>
+</div>
+
+<div class="cold-banner">
+  <span>❄️ <strong>Cold muscle tip:</strong> Move into each stretch slowly for the first 30 seconds. No bouncing — let your breath and gravity do the work.</span>
+</div>
+
+<div class="timer-section">
+  <div class="timer-pose" id="timerLabel">Ready to begin</div>
+  <div class="timer-name" id="timerName">Tap Start to begin your routine</div>
+  <div class="timer-tag" id="timerTag"></div>
+  <div class="timer-circle">
+    <svg width="130" height="130" viewBox="0 0 130 130">
+      <circle class="bg" cx="65" cy="65" r="55"/>
+      <circle class="prog" cx="65" cy="65" r="55" id="progressRing"/>
+    </svg>
+    <div class="timer-display" id="timerDisplay">–</div>
+  </div>
+  <div class="timer-btns">
+    <button class="btn btn-primary" id="startBtn" onclick="startRoutine()">▶ Start</button>
+    <button class="btn btn-secondary" id="skipBtn" onclick="nextStretch()" style="display:none">Skip ›</button>
+    <button class="btn btn-secondary" id="resetBtn" onclick="resetRoutine()" style="display:none">↺ Reset</button>
+  </div>
+  <div class="progress-dots" id="progressDots"></div>
+</div>
+
+<div class="section-title">Your Routine</div>
+<div id="stretchCards"></div>
+
+<div class="section-title">Weekly Tracker</div>
+<div class="week-section">
+  <h3>This Week</h3>
+  <div class="week-grid" id="weekGrid"></div>
+</div>
+
+<div class="tips">
+  <h3>💡 Cold Morning Tips</h3>
+  <div class="tip"><span>🐢</span><span>Go slower than you think — cold muscles need 2–3 min before they open up</span></div>
+  <div class="tip"><span>😮‍💨</span><span>Deep breathing is your warm-up — exhale into each stretch to release tension</span></div>
+  <div class="tip"><span>🦋</span><span>The butterfly & 90/90 will feel brutal at first — that's normal, it gets better fast</span></div>
+  <div class="tip"><span>📈</span><span>Hips and groin typically loosen up noticeably within 3–4 weeks of daily work</span></div>
+</div>
+
+<script>
+const stretches = [
+  {
+    name: "Supine Knee Rocks",
+    duration: 60, side: false,
+    tag: "🔥 Cold Muscle Warm-Up",
+    tagClass: "tag-warmup",
+    desc: "Lie on your back, knees bent, feet flat. Let both knees slowly fall to one side, pause, then rock to the other. This is your cold-muscle starter — gentle spinal rotation gets blood moving without forcing anything.",
+    url: "https://www.youtube.com/results?search_query=supine+knee+rocks+spinal+rotation+stretch"
+  },
+  {
+    name: "Happy Baby",
+    duration: 60, side: false,
+    tag: "🦋 Hips & Groin",
+    tagClass: "tag-hip",
+    desc: "Lie on your back, pull both knees toward your chest then grab the outside of each foot. Let your knees fall wide toward your armpits. Breathe deeply — this opens the hips and groin beautifully from a safe, flat position.",
+    url: "https://www.youtube.com/results?search_query=happy+baby+pose+yoga+tutorial+beginners"
+  },
+  {
+    name: "Butterfly Stretch",
+    duration: 75, side: false,
+    tag: "🦋 Groin & Inner Thigh",
+    tagClass: "tag-groin",
+    desc: "Sit with soles of feet together, knees dropped out to the sides. Hold your feet and gently hinge forward from your hips — don't round your back. This is the best direct stretch for the groin tightness that makes criss-cross uncomfortable.",
+    url: "https://www.youtube.com/results?search_query=butterfly+stretch+groin+tutorial+beginners"
+  },
+  {
+    name: "90/90 Hip Stretch",
+    duration: 60, side: true,
+    tag: "🔄 Hip Rotation",
+    tagClass: "tag-hip",
+    desc: "Sit with both legs bent at 90 degrees — one knee in front, one to the side. Keep your torso upright and sit tall. This directly targets hip external rotation, which is exactly what's needed to sit criss-cross comfortably.",
+    url: "https://www.youtube.com/results?search_query=90+90+hip+stretch+tutorial"
+  },
+  {
+    name: "Low Lunge (Hip Flexor)",
+    duration: 45, side: true,
+    tag: "🔓 Hip Flexor",
+    tagClass: "tag-hip",
+    desc: "Step one foot forward, drop back knee to floor. Push hips gently forward and down. Sitting all day shortens your hip flexors — this counters that directly and also relieves tension that travels down into the hamstrings.",
+    url: "https://www.youtube.com/results?search_query=low+lunge+hip+flexor+stretch+yoga+tutorial"
+  },
+  {
+    name: "Seated Forward Fold",
+    duration: 75, side: false,
+    tag: "🦵 Hamstrings",
+    tagClass: "tag-hamstring",
+    desc: "Sit with legs straight out. Reach toward your feet, keeping your back as flat as possible. Hold wherever you feel the pull — no need to force it. By this point in the routine your muscles are warmer and you'll get more out of this than if you started here.",
+    url: "https://www.youtube.com/results?search_query=seated+forward+fold+yoga+tutorial+beginners"
+  },
+  {
+    name: "Supine Hamstring Stretch",
+    duration: 45, side: true,
+    tag: "🦵 Hamstrings",
+    tagClass: "tag-hamstring",
+    desc: "Lie on your back and loop a towel or belt around one foot. Pull your straight leg toward you. Isolates each hamstring individually without compensation from your back or hips.",
+    url: "https://www.youtube.com/results?search_query=supine+hamstring+stretch+strap+tutorial"
+  },
+  {
+    name: "Pigeon Pose",
+    duration: 60, side: true,
+    tag: "🍑 Glutes & Hips",
+    tagClass: "tag-hip",
+    desc: "From hands and knees, bring one knee forward behind your wrist and extend the back leg straight. Sink your hips toward the floor. Tight glutes are often a hidden driver of both hamstring and hip tightness — this gets deep into them.",
+    url: "https://www.youtube.com/results?search_query=pigeon+pose+yoga+tutorial+beginners"
+  },
+  {
+    name: "Standing Forward Fold",
+    duration: 45, side: false,
+    tag: "🦵 Hamstrings",
+    tagClass: "tag-hamstring",
+    desc: "Stand feet hip-width apart and hinge forward, letting your upper body hang heavy. After all the floor work, this feels completely different — your hamstrings will have more range than when you started.",
+    url: "https://www.youtube.com/results?search_query=standing+forward+fold+hamstring+stretch+tutorial"
+  },
+  {
+    name: "Child's Pose",
+    duration: 45, side: false,
+    tag: "✨ Full Body Reset",
+    tagClass: "tag-full",
+    desc: "Kneel and sit back on heels, arms extended forward, forehead down. Your finishing pose — decompresses the spine, settles the hips, and gives your body a moment to absorb everything before you start your day.",
+    url: "https://www.youtube.com/results?search_query=child%27s+pose+yoga+tutorial+beginners"
+  }
+];
+
+let steps = [];
+stretches.forEach((s) => {
+  if (s.side) {
+    steps.push({ ...s, displayName: s.name + " — Left Side" });
+    steps.push({ ...s, displayName: s.name + " — Right Side" });
+  } else {
+    steps.push({ ...s, displayName: s.name });
+  }
+});
+steps.forEach((s, i) => s.label = `Stretch ${i+1} of ${steps.length}`);
+
+let currentStep = 0, timerInterval = null, timeLeft = 0, running = false, finished = false;
+const CIRCUMFERENCE = 2 * Math.PI * 55;
+
+// Build cards
+const cardsEl = document.getElementById('stretchCards');
+stretches.forEach((s, i) => {
+  cardsEl.innerHTML += `
+  <div class="card" id="card${i}">
+    <div class="card-header" onclick="toggle(${i})">
+      <div class="num" id="num${i}">${i+1}</div>
+      <div class="card-info">
+        <h3>${s.name}</h3>
+        <span class="duration">⏱ ${s.side ? s.duration+' sec each side' : s.duration+' sec'}</span>
+        <span class="tag-pill ${s.tagClass}">${s.tag}</span>
+      </div>
+      <div class="chevron" id="chev${i}">›</div>
+    </div>
+    <div class="card-body" id="body${i}">
+      <p>${s.desc}</p>
+      <a class="tutorial-btn" href="${s.url}" target="_blank">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="#60a5fa"><path d="M10 15l5.19-3L10 9v6zM12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"/></svg>
+        Watch Tutorial on YouTube
+      </a>
+    </div>
+  </div>`;
+});
+
+// Build progress dots
+const dotsEl = document.getElementById('progressDots');
+steps.forEach((_, i) => { dotsEl.innerHTML += `<div class="dot" id="dot${i}"></div>`; });
+
+function toggle(i) {
+  document.getElementById('body'+i).classList.toggle('open');
+  document.getElementById('chev'+i).classList.toggle('open');
+}
+
+function updateTimer(time, total) {
+  document.getElementById('timerDisplay').textContent = time;
+  const offset = CIRCUMFERENCE * (1 - time / total);
+  document.getElementById('progressRing').style.strokeDashoffset = offset;
+  document.getElementById('progressRing').style.strokeDasharray = CIRCUMFERENCE;
+}
+
+function setStep(i) {
+  currentStep = i;
+  const s = steps[i];
+  timeLeft = s.duration;
+  document.getElementById('timerLabel').textContent = s.label;
+  document.getElementById('timerName').textContent = s.displayName;
+  document.getElementById('timerTag').textContent = s.tag;
+  updateTimer(timeLeft, s.duration);
+  steps.forEach((_, j) => {
+    document.getElementById('dot'+j).className = 'dot' + (j < i ? ' done' : j === i ? ' active' : '');
+  });
+}
+
+function startRoutine() {
+  if (finished) return;
+  document.getElementById('startBtn').style.display = 'none';
+  document.getElementById('skipBtn').style.display = '';
+  document.getElementById('resetBtn').style.display = '';
+  setStep(0); running = true; runTimer();
+}
+
+function runTimer() {
+  clearInterval(timerInterval);
+  timerInterval = setInterval(() => {
+    if (!running) return;
+    timeLeft--;
+    updateTimer(timeLeft, steps[currentStep].duration);
+    if (timeLeft <= 0) { clearInterval(timerInterval); nextStretch(); }
+  }, 1000);
+}
+
+function nextStretch() {
+  clearInterval(timerInterval);
+  if (currentStep + 1 >= steps.length) { finishRoutine(); return; }
+  setStep(currentStep + 1); running = true; runTimer();
+}
+
+function finishRoutine() {
+  finished = true;
+  document.getElementById('timerLabel').textContent = '🎉 Complete!';
+  document.getElementById('timerName').textContent = 'Great work — have an awesome day!';
+  document.getElementById('timerTag').textContent = '';
+  document.getElementById('timerDisplay').textContent = '✓';
+  document.getElementById('progressRing').style.strokeDashoffset = 0;
+  document.getElementById('skipBtn').style.display = 'none';
+  markToday(); updateStreak();
+}
+
+function resetRoutine() {
+  clearInterval(timerInterval);
+  finished = false; running = false; currentStep = 0;
+  document.getElementById('timerLabel').textContent = 'Ready to begin';
+  document.getElementById('timerName').textContent = 'Tap Start to begin your routine';
+  document.getElementById('timerTag').textContent = '';
+  document.getElementById('timerDisplay').textContent = '–';
+  document.getElementById('progressRing').style.strokeDashoffset = 0;
+  document.getElementById('startBtn').style.display = '';
+  document.getElementById('skipBtn').style.display = 'none';
+  document.getElementById('resetBtn').style.display = 'none';
+  steps.forEach((_, j) => document.getElementById('dot'+j).className = 'dot');
+}
+
+const days = ['Su','Mo','Tu','We','Th','Fr','Sa'];
+const todayIdx = new Date().getDay();
+function getWeekKey() {
+  const d = new Date(); d.setHours(0,0,0,0); d.setDate(d.getDate()-d.getDay());
+  return d.toISOString().split('T')[0];
+}
+function getStored() { return JSON.parse(localStorage.getItem('stretchDays')||'{}'); }
+
+const grid = document.getElementById('weekGrid');
+days.forEach((d, i) => {
+  const stored = getStored(); const wk = getWeekKey();
+  const dot = document.createElement('div');
+  dot.id = 'wday'+i;
+  dot.className = 'day-dot'+(stored[wk]?.[i]?' done':'')+(i===todayIdx?' today':'');
+  dot.innerHTML = `<span>${d}</span>${stored[wk]?.[i]?'✓':''}`;
+  dot.onclick = () => {
+    const s = getStored(); const wk = getWeekKey();
+    if (!s[wk]) s[wk]={};
+    s[wk][i] = !s[wk][i];
+    localStorage.setItem('stretchDays', JSON.stringify(s));
+    dot.className = 'day-dot'+(s[wk][i]?' done':'')+(i===todayIdx?' today':'');
+    dot.innerHTML = `<span>${d}</span>${s[wk][i]?'✓':''}`;
+    updateStreak();
+  };
+  grid.appendChild(dot);
+});
+
+function markToday() {
+  const s = getStored(); const wk = getWeekKey();
+  if (!s[wk]) s[wk]={};
+  s[wk][todayIdx] = true;
+  localStorage.setItem('stretchDays', JSON.stringify(s));
+  const dot = document.getElementById('wday'+todayIdx);
+  if (dot) { dot.className = 'day-dot done today'; dot.innerHTML = `<span>${days[todayIdx]}</span>✓`; }
+}
+
+function updateStreak() {
+  const data = getStored(); let streak = 0;
+  const check = new Date();
+  for (let i = 0; i < 90; i++) {
+    check.setHours(0,0,0,0);
+    const wk = (() => { const d=new Date(check); d.setDate(d.getDate()-d.getDay()); return d.toISOString().split('T')[0]; })();
+    if (data[wk]?.[check.getDay()]) streak++;
+    else if (i > 0) break;
+    check.setDate(check.getDate()-1);
+  }
+  document.getElementById('streakNum').textContent = streak;
+}
+updateStreak();
+</script>
+</body>
+</html>
