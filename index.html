@@ -1,0 +1,608 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>System Dashboard</title>
+  <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Rajdhani:wght@300;400;600;700&display=swap" rel="stylesheet"/>
+  <style>
+    :root {
+      --bg-base:      #181a1f;
+      --bg-panel:     #1e2128;
+      --bg-card:      #242830;
+      --bg-card-hover:#2a2f3a;
+      --border:       #2e3340;
+      --border-glow:  #00c8ff55;
+      --cyan:         #00c8ff;
+      --cyan-dim:     #00c8ff99;
+      --cyan-faint:   #00c8ff18;
+      --cyan-mid:     #0096cc;
+      --text-primary: #e8eaf0;
+      --text-secondary:#8b92a8;
+      --text-muted:   #555c70;
+      --font-display: 'Rajdhani', sans-serif;
+      --font-mono:    'Share Tech Mono', monospace;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg-base);
+      color: var(--text-primary);
+      font-family: var(--font-display);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* ── GRID BACKGROUND ── */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(0,200,255,0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0,200,255,0.03) 1px, transparent 1px);
+      background-size: 40px 40px;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* ── RADIAL GLOW CENTER ── */
+    body::after {
+      content: '';
+      position: fixed;
+      top: -20%;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 800px;
+      height: 500px;
+      background: radial-gradient(ellipse, rgba(0,200,255,0.07) 0%, transparent 70%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* ── LAYOUT ── */
+    .shell {
+      position: relative;
+      z-index: 1;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 32px 80px;
+    }
+
+    /* ── TOP BAR ── */
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 22px 0 18px;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 48px;
+      animation: fadeDown 0.6s ease both;
+    }
+
+    .topbar-left {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .logo-mark {
+      width: 36px;
+      height: 36px;
+      border: 2px solid var(--cyan);
+      display: grid;
+      place-items: center;
+      position: relative;
+      clip-path: polygon(10% 0%, 90% 0%, 100% 10%, 100% 90%, 90% 100%, 10% 100%, 0% 90%, 0% 10%);
+      background: var(--cyan-faint);
+      box-shadow: 0 0 16px var(--border-glow);
+    }
+
+    .logo-mark::after {
+      content: '';
+      width: 10px;
+      height: 10px;
+      background: var(--cyan);
+      clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);
+    }
+
+    .logo-text {
+      font-family: var(--font-mono);
+      font-size: 13px;
+      color: var(--cyan);
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    .logo-sub {
+      display: block;
+      font-size: 10px;
+      color: var(--text-muted);
+      letter-spacing: 0.2em;
+      margin-top: 1px;
+    }
+
+    .topbar-right {
+      display: flex;
+      align-items: center;
+      gap: 24px;
+    }
+
+    .status-dot {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--text-muted);
+      letter-spacing: 0.08em;
+    }
+
+    .dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: #22dd88;
+      box-shadow: 0 0 8px #22dd8880;
+      animation: pulse 2.5s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.4; }
+    }
+
+    .clock {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      color: var(--text-secondary);
+      letter-spacing: 0.1em;
+    }
+
+    /* ── HERO ── */
+    .hero {
+      margin-bottom: 56px;
+      animation: fadeUp 0.7s 0.1s ease both;
+    }
+
+    .hero-label {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--cyan-dim);
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      margin-bottom: 12px;
+    }
+
+    .hero-title {
+      font-size: clamp(36px, 5vw, 60px);
+      font-weight: 700;
+      line-height: 1.05;
+      letter-spacing: -0.01em;
+      color: var(--text-primary);
+    }
+
+    .hero-title span {
+      color: var(--cyan);
+      position: relative;
+    }
+
+    .hero-title span::after {
+      content: '';
+      position: absolute;
+      left: 0; bottom: 2px;
+      width: 100%;
+      height: 2px;
+      background: linear-gradient(90deg, var(--cyan), transparent);
+    }
+
+    .hero-desc {
+      margin-top: 16px;
+      font-size: 16px;
+      color: var(--text-secondary);
+      font-weight: 300;
+      max-width: 480px;
+      line-height: 1.6;
+    }
+
+    /* ── SECTION LABEL ── */
+    .section-label {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 20px;
+      animation: fadeUp 0.7s 0.2s ease both;
+    }
+
+    .section-label span {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--text-muted);
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+    }
+
+    .section-label::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: linear-gradient(90deg, var(--border), transparent);
+    }
+
+    /* ── CARD GRID ── */
+    .card-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 16px;
+      margin-bottom: 48px;
+    }
+
+    .card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 28px 26px 24px;
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+      transition: background 0.25s, border-color 0.25s, transform 0.2s;
+      text-decoration: none;
+      display: block;
+      animation: fadeUp 0.6s ease both;
+    }
+
+    .card:nth-child(1) { animation-delay: 0.25s; }
+    .card:nth-child(2) { animation-delay: 0.32s; }
+    .card:nth-child(3) { animation-delay: 0.39s; }
+    .card:nth-child(4) { animation-delay: 0.46s; }
+    .card:nth-child(5) { animation-delay: 0.53s; }
+    .card:nth-child(6) { animation-delay: 0.60s; }
+
+    /* corner accent */
+    .card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0;
+      width: 32px; height: 32px;
+      border-top: 2px solid var(--cyan);
+      border-left: 2px solid var(--cyan);
+      opacity: 0;
+      transition: opacity 0.25s;
+    }
+
+    .card::after {
+      content: '';
+      position: absolute;
+      bottom: 0; right: 0;
+      width: 32px; height: 32px;
+      border-bottom: 2px solid var(--cyan);
+      border-right: 2px solid var(--cyan);
+      opacity: 0;
+      transition: opacity 0.25s;
+    }
+
+    .card:hover {
+      background: var(--bg-card-hover);
+      border-color: var(--border-glow);
+      transform: translateY(-3px);
+    }
+
+    .card:hover::before,
+    .card:hover::after {
+      opacity: 1;
+    }
+
+    .card-icon {
+      width: 40px;
+      height: 40px;
+      border: 1px solid var(--border);
+      border-radius: 3px;
+      display: grid;
+      place-items: center;
+      margin-bottom: 18px;
+      background: var(--bg-panel);
+      transition: border-color 0.25s, background 0.25s;
+      font-size: 18px;
+    }
+
+    .card:hover .card-icon {
+      border-color: var(--cyan-dim);
+      background: var(--cyan-faint);
+    }
+
+    .card-tag {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      color: var(--text-muted);
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      margin-bottom: 6px;
+    }
+
+    .card-title {
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--text-primary);
+      letter-spacing: 0.01em;
+      margin-bottom: 8px;
+      transition: color 0.2s;
+    }
+
+    .card:hover .card-title { color: var(--cyan); }
+
+    .card-desc {
+      font-size: 13px;
+      color: var(--text-secondary);
+      line-height: 1.55;
+      font-weight: 300;
+    }
+
+    .card-arrow {
+      position: absolute;
+      bottom: 22px;
+      right: 24px;
+      font-size: 18px;
+      color: var(--text-muted);
+      transition: color 0.2s, transform 0.2s;
+    }
+
+    .card:hover .card-arrow {
+      color: var(--cyan);
+      transform: translate(3px, -3px);
+    }
+
+    /* ── FEATURED (wide) CARD ── */
+    .card.featured {
+      grid-column: span 2;
+      display: flex;
+      align-items: flex-start;
+      gap: 32px;
+      padding: 32px;
+    }
+
+    @media (max-width: 680px) {
+      .card.featured { grid-column: span 1; flex-direction: column; gap: 20px; }
+    }
+
+    .card.featured .card-icon {
+      width: 56px;
+      height: 56px;
+      font-size: 24px;
+      flex-shrink: 0;
+    }
+
+    /* ── STATUS ROW ── */
+    .status-row {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+      gap: 12px;
+      margin-bottom: 48px;
+      animation: fadeUp 0.7s 0.5s ease both;
+    }
+
+    .stat-chip {
+      background: var(--bg-panel);
+      border: 1px solid var(--border);
+      border-radius: 3px;
+      padding: 14px 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .stat-label {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      color: var(--text-muted);
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+    }
+
+    .stat-value {
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--cyan);
+      line-height: 1;
+    }
+
+    .stat-sub {
+      font-size: 11px;
+      color: var(--text-muted);
+      font-weight: 300;
+    }
+
+    /* ── FOOTER ── */
+    .footer {
+      border-top: 1px solid var(--border);
+      padding-top: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      animation: fadeUp 0.7s 0.6s ease both;
+    }
+
+    .footer-text {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--text-muted);
+      letter-spacing: 0.1em;
+    }
+
+    .footer-text a {
+      color: var(--cyan-dim);
+      text-decoration: none;
+    }
+
+    .footer-text a:hover { color: var(--cyan); }
+
+    /* ── SCAN LINE EFFECT ── */
+    .scanlines {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 999;
+      background: repeating-linear-gradient(
+        to bottom,
+        transparent 0px,
+        transparent 3px,
+        rgba(0,0,0,0.04) 3px,
+        rgba(0,0,0,0.04) 4px
+      );
+    }
+
+    /* ── ANIMATIONS ── */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(18px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes fadeDown {
+      from { opacity: 0; transform: translateY(-12px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ── SCROLLBAR ── */
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: var(--bg-base); }
+    ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+    ::-webkit-scrollbar-thumb:hover { background: var(--cyan-dim); }
+  </style>
+</head>
+<body>
+
+<div class="scanlines"></div>
+
+<div class="shell">
+
+  <!-- TOP BAR -->
+  <header class="topbar">
+    <div class="topbar-left">
+      <div class="logo-mark"></div>
+      <div class="logo-text">
+        MY SYSTEM
+        <span class="logo-sub">PERSONAL BUILD · v0.1</span>
+      </div>
+    </div>
+    <div class="topbar-right">
+      <div class="status-dot">
+        <div class="dot"></div>
+        ONLINE
+      </div>
+      <div class="clock" id="clock">--:--:--</div>
+    </div>
+  </header>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-label">// dashboard · index</div>
+    <h1 class="hero-title">
+      Your <span>Command</span><br/>Center
+    </h1>
+    <p class="hero-desc">
+      Central hub for all your projects, tools, and pages. 
+      Navigate, build, and expand your personal system.
+    </p>
+  </section>
+
+  <!-- QUICK STATS -->
+  <div class="section-label"><span>// overview</span></div>
+  <div class="status-row">
+    <div class="stat-chip">
+      <span class="stat-label">Pages</span>
+      <span class="stat-value">04</span>
+      <span class="stat-sub">active sections</span>
+    </div>
+    <div class="stat-chip">
+      <span class="stat-label">Status</span>
+      <span class="stat-value" style="color:#22dd88">Live</span>
+      <span class="stat-sub">github pages</span>
+    </div>
+    <div class="stat-chip">
+      <span class="stat-label">Build</span>
+      <span class="stat-value">01</span>
+      <span class="stat-sub">expanding</span>
+    </div>
+    <div class="stat-chip">
+      <span class="stat-label">Last Update</span>
+      <span class="stat-value" id="today-date" style="font-size:16px; padding-top:3px;">–</span>
+      <span class="stat-sub">today</span>
+    </div>
+  </div>
+
+  <!-- PAGES GRID -->
+  <div class="section-label"><span>// sections</span></div>
+  <div class="card-grid">
+
+    <!-- FEATURED card -->
+    <a href="#" class="card featured">
+      <div class="card-icon">🏠</div>
+      <div>
+        <div class="card-tag">Primary</div>
+        <div class="card-title">Home Base</div>
+        <div class="card-desc">
+          Your main starting point. Overview of everything happening across the system — recent activity, quick links, and current focus.
+        </div>
+      </div>
+      <div class="card-arrow">↗</div>
+    </a>
+
+    <a href="#" class="card">
+      <div class="card-icon">📋</div>
+      <div class="card-tag">Module</div>
+      <div class="card-title">Projects</div>
+      <div class="card-desc">All active builds, side projects, and experiments in one place.</div>
+      <div class="card-arrow">↗</div>
+    </a>
+
+    <a href="#" class="card">
+      <div class="card-icon">🗒️</div>
+      <div class="card-tag">Module</div>
+      <div class="card-title">Notes</div>
+      <div class="card-desc">Reference docs, scratch notes, and ideas captured as you go.</div>
+      <div class="card-arrow">↗</div>
+    </a>
+
+    <a href="#" class="card">
+      <div class="card-icon">🔧</div>
+      <div class="card-tag">Module</div>
+      <div class="card-title">Tools</div>
+      <div class="card-desc">Utilities, scripts, and helpers built for your workflow.</div>
+      <div class="card-arrow">↗</div>
+    </a>
+
+  </div>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <span class="footer-text">PERSONAL SYSTEM DASHBOARD &nbsp;·&nbsp; BUILT WITH PURPOSE</span>
+    <span class="footer-text">
+      <a href="https://github.com" target="_blank">GitHub ↗</a>
+    </span>
+  </footer>
+
+</div>
+
+<script>
+  // Live clock
+  function updateClock() {
+    const now = new Date();
+    const h = String(now.getHours()).padStart(2,'0');
+    const m = String(now.getMinutes()).padStart(2,'0');
+    const s = String(now.getSeconds()).padStart(2,'0');
+    document.getElementById('clock').textContent = `${h}:${m}:${s}`;
+  }
+  updateClock();
+  setInterval(updateClock, 1000);
+
+  // Today's date in stat chip
+  const d = new Date();
+  const months = ['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
+  document.getElementById('today-date').textContent =
+    `${String(d.getDate()).padStart(2,'0')} ${months[d.getMonth()]}`;
+</script>
+
+</body>
+</html>
